@@ -24,25 +24,26 @@ This template helps you go from **data ingestion** ➜ **transformation** ➜ **
 
 ```bash
 sddd-template/
-├── dlt_pipeline/
+├── data/                   # For .duckdb and other persistent data files
+│   └── openweather.duckdb   # Your DuckDB database
+│
+├── dlt_pipeline/           # Contains source logic split into clean modules
 │   ├── __init__.py
-│   └── openweather_source.py   # Define dlt pipeline
+│   ├── db.py               # DuckDBConnection class
+│   ├── fetch_current.py    # current_weather resource
+│   ├── fetch_historical.py # historical_weather placeholder
+│   ├── pipeline.py         # run_pipeline and openweather_source
 │
-├── dbt_project/
-│   ├── models/
-│   │   └── staging/
-│   │       └── stg_weather.sql
-│   └── dbt_project.yml
+├── streamlit_app/          # Your Streamlit dashboard
+│   ├── app.py              # Streamlit app file
 │
-├── streamlit_app/
-│   └── dashboard.py
-│
-├── data/                      # Local data storage (optional)
-│
-├── .env                      # API keys and configs
+├── config.py               # Configuration file moved to the root
+├── .env                    # API key (not in Git)
+├── .gitignore
+├── README.md               # Quick start
 ├── requirements.txt
-├── README.md
-└── setup.sh                  # (Optional) Setup script
+├── setup.sh
+
 ```
 
 <br/>
