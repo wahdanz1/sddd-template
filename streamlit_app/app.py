@@ -1,55 +1,50 @@
+import os
+import sys
+import pandas as pd
 import streamlit as st
 import plotly.express as px
-import pandas as pd
-import sys
-import os
-import requests
 
 # Add the root directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from dlt_pipeline.db import DuckDBConnection
 from dlt_pipeline.pipeline import run_pipeline
-from config import db_path
+from utils.data_fetching import is_data_fresh, get_weather_data_for_cities
+from utils.constants import cities
+import utils.plotting as plotting
 
 # --- Dashboard components ---
 st.title("🌦️ OpenWeatherMap Dashboard")
 
 # --- Select a city for current weather data ---
 st.markdown("## Current Weather Data")
-cities = st.multiselect("Select a city:", ["New York", "London", "Tokyo", "Uddevalla", "San Pedro Sula", "Visby"])
 
-# --- Trigger the data fetching when cities are selected --- 
-if cities:
-    # Call the pipeline to fetch data if necessary
-    with st.spinner('Fetching weather data...'):
-        run_pipeline(cities, "current_weather")
-        st.success('Data fetched successfully!')
+selected_cities = st.multiselect("Select a city:", cities)
+force_refresh = st.button("🔄 Force-fetch data")
 
-    # --- Query weather data from DuckDB based on selected cities --- 
-    with DuckDBConnection(db_path) as conn:
-        city_query = f"""
-            SELECT * FROM staging.current_weather
-            WHERE city IN ({', '.join([f"'{city}'" for city in cities])})
-            """
-        
-        # Execute the query and fetch the data
-        weather_data = conn.query(city_query)
+# --- Trigger the data fetching when cities are selected ---
+for city in selected_cities:
+    needs_update = not is_data_fresh(city) or force_refresh
+    # Check if the weather data is fresh
+    if needs_update:
+        with st.spinner(f'Fetching weather data for {city}...'):
+            # If the data is not fresh, run the pipeline to fetch the latest data
+            run_pipeline([city], "current_weather")
+            st.success(f'Data for {city} fetched successfully!')
 
-        # --- Display the data in a table ---
-        st.write("### Current Weather Data", weather_data)
+# --- Query weather data from DuckDB based on selected cities ---
+if selected_cities:
+    weather_data = get_weather_data_for_cities(selected_cities)
 
-        # --- Plot the data using Plotly ---
-        if not weather_data.empty:
-            fig = px.bar(
-                weather_data,
-                x="city",
-                y="temperature",
-                color="city",
-                title="Current Temperature by City",
-                )
-            st.plotly_chart(fig, use_container_width=True)
+    # --- Display the data in a table ---
+    st.dataframe(weather_data, use_container_width=True)
 
-        else: 
-            st.write("Please select a city to view the current weather data.")
+    # --- Plot the data using Plotly ---
+    if not weather_data.empty:
+        fig_bar = plotting.create_temperature_bar_chart(weather_data)
+        st.plotly_chart(fig_bar, use_container_width=True)
+        fig_line = plotting.create_temperature_line_chart(weather_data)
+        st.plotly_chart(fig_line, use_container_width=True)
+
+    else:
+        st.info("Please select at least one city to view weather data.")
 
