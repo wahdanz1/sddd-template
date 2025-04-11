@@ -9,13 +9,17 @@ A template to quickly set up a data pipeline and dashboard using:
 
 This template helps you go from **data ingestion** ➜ **transformation** ➜ **visualization** in no time.
 
+> ⚠️ I am using this project as a *learn-by-doing* side project while attending a programming course. Therefore, some parts may vary in quality as I learn and experiment!
+
 <br/>
 
 ## 🧪 Example: OpenWeather API
 **What you get:**
-- Current weather in user-input city
-- Historical weather data (to be extended)
-- Clear table of metrics (e.g. temp, humidity, wind)
+- Fetch current weather in multiple cities
+- Store results in DuckDB locally
+- Visualize weather metrics:
+  - Metric table with temperature, humidity, wind
+  - 📈 Line chart showing temperature trends per city
 
 <br/>
 
@@ -24,30 +28,34 @@ This template helps you go from **data ingestion** ➜ **transformation** ➜ **
 
 ```bash
 sddd-template/
-├── data/                   # For .duckdb and other persistent data files
-│   └── openweather.duckdb  # Your DuckDB database
+├── data/                       # For .duckdb and other persistent data files
+│   └── openweather.duckdb      # Your DuckDB database
 │
-├── dbt_project/            # For dbt (to be implemented)
+├── dbt_project/                # For dbt (to be implemented)
 │
-├── dlt_pipeline/           # Contains source logic split into clean modules
+├── dlt_pipeline/               # Contains source logic split into clean modules
 │   ├── __init__.py
-│   ├── db.py               # DuckDBConnection class
-│   ├── fetch_current.py    # current_weather resource
-│   ├── fetch_historical.py # historical_weather placeholder
-│   ├── pipeline.py         # run_pipeline and openweather_source
+│   ├── db.py                   # DuckDBConnection class
+│   ├── fetch_current.py        # current_weather resource
+│   ├── fetch_historical.py     # historical_weather placeholder
+│   ├── pipeline.py             # run_pipeline and openweather_source
 │
-├── docs/                   # Documentation
+├── docs/                       # Documentation
 │   ├── documentation.md
 │
-├── streamlit_app/          # The Streamlit dashboard
-│   ├── app.py              # Streamlit app file
+├── streamlit_app/              # The Streamlit dashboard
+│   ├── utils/                  # Streamlit utility folder
+│       ├── constants.py
+│       ├── data_fetching.py
+│       ├── plotting.py
+│   ├── app.py                  # Streamlit app file
 │
-├── .env                    # API key (not in Git - need to be created locally)
+├── .env                        # API key (not in Git - need to be created locally)
 ├── .gitignore
-├── config.py               # Configuration file moved to the root
-├── README.md               # Quick start
+├── config.py                   # Configuration file moved to the root
+├── README.md                   # Quick start
 ├── requirements.txt
-├── run_test.py             # Test script
+├── run_test.py                 # Test script
 ├── setup.sh
 
 ```
@@ -56,25 +64,26 @@ sddd-template/
 
 ## 📁 How to use this template
 1. 🧱 Clone the template:
-    ```
+    ```bash
     git clone https://github.com/your-username/sddd-template
+    cd sddd-template
 2. ⚙️ Install dependencies:
 
     Use ```venv```, ```pipenv```, ```conda``` or ```uv```. Example with ```uv```:
-    ```
+    ```bash
     uv venv
-    .venv\scripts\activate
+    .venv\scripts\activate     # Windows
+    source .venv/bin/activate  # Mac/Linux
     uv pip install -r requirements.txt
 3. 🔑 Configure API access:
 
     Create a ```.env``` file in the root folder:
-    ```
+    ```bash
     OPENWEATHER_API_KEY=your_api_key_here
 4. 📊 Launch Streamlit Dashboard
-    ```
+    ```bash
     streamlit run streamlit_app/dashboard.py
-
-(**dbt** to be implemented)
+(**dbt** integration coming soon)
 <!---
 4. 🧪 Run the dlt Pipeline:
     ```
@@ -89,29 +98,25 @@ sddd-template/
 
 
 ## 🧰 Customizing the Template
-**Documentation coming soon!**
-<!---
-**To use with a new data source:**
-1. Duplicate ```openweather_source.py``` and adapt to your source (e.g. ```reddit_source.py```).
-2. Update ```dbt/models/staging/``` with new SQL models.
-3. Update your Streamlit dashboard to show new visuals.
-4. Update ```.env``` with new API keys or configs.
-5. Rename the project files/folders if needed.
- -->
+**Documentation and guide for adding new APIs or sources is in progress. You'll be able to:**
+- Add new dlt pipelines
+- Extend the dbt SQL models
+- Visualize different data types in Streamlit
+- Plug in ML or scheduling
 
 <br/>
 
 ## 🧠 Planned Extensions
-- 🧠 Add a regression model (e.g. linear regression) to forecast weather
-- 📅 Add scheduling with ```cron``` or ```Airflow``` (possibly)
-- 🐳 Add Docker support for full deployable stack
+- 🔮 Add a regression model to forecast temperature trends
+- 🕰️ Add scheduling (cron or Airflow)
+- 🐳 Dockerize the full stack
 
 <br/>
 
 ## 📝 Naming Conventions
-- Pipelines in ```dlt_pipeline/pipeline.py``` should be named ```<source>_source.py```
-- Models in ```dbt/models/staging/``` should be named ```stg_<source>.sql```
-- Dashboard file should be in ```streamlit_app/``` and named ```dashboard.py```
+- Pipelines: ```dlt_pipeline/<source>_source.py```
+- dbt models: ```dbt_project/models/staging/stg_<source>.sql```
+- Dashboard: ```streamlit_app/app.py```
 
 <br/>
 
