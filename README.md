@@ -66,6 +66,9 @@ sddd-template/
 4. 🧪 Run the dlt Pipeline:
     ```
     python dlt_pipeline/openweather_source.py
+
+(**Streamlit** and **dbt** to be implemented)
+<!---
 5. 📦 Run dbt Transformations
     ```
     cd dbt_project
@@ -73,6 +76,7 @@ sddd-template/
 6. 📊 Launch Streamlit Dashboard
     ```
     streamlit run streamlit_app/dashboard.py
+    -->
 ---
 <br/>
 
