@@ -13,10 +13,13 @@ class DuckDBConnection:
         self.conn = ddb.connect(str(self.db_path))
         return self
     
-    def query(self, query):
-        """Execute a query and return the result."""
+    def query(self, query, params=None) -> pd.DataFrame:
+        """Execute a query with optional parameters and return the result."""
         try:
-            return self.conn.execute(query).df()
+            if params:
+                return self.conn.execute(query, params).df()
+            else:
+                return self.conn.execute(query).df()
         except Exception as e:
             print(f"Error executing query: {e}")
             return pd.DataFrame()  # Return an empty DataFrame if there's an error
